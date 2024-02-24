@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
 namespace ClubConnect2._0.Controllers
 {
-    public class AppautorizaciondsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AppautorizaciondsController : ControllerBase
     {
         private readonly CuotasV100Context _context;
 
@@ -18,78 +18,47 @@ namespace ClubConnect2._0.Controllers
             _context = context;
         }
 
-        // GET: Appautorizacionds
-        public async Task<IActionResult> Index()
+        // GET: api/Appautorizacionds
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Appautorizaciond>>> GetAppautorizacionds()
         {
-            return View(await _context.Appautorizacionds.ToListAsync());
+            return await _context.Appautorizacionds.ToListAsync();
         }
 
-        // GET: Appautorizacionds/Details/5
-        public async Task<IActionResult> Details(string id)
+        // GET: api/Appautorizacionds/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Appautorizaciond>> GetAppautorizaciond(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var appautorizaciond = await _context.Appautorizacionds.FirstOrDefaultAsync(m => m.CodTercero == id);
 
-            var appautorizaciond = await _context.Appautorizacionds
-                .FirstOrDefaultAsync(m => m.CodTercero == id);
             if (appautorizaciond == null)
             {
                 return NotFound();
             }
 
-            return View(appautorizaciond);
+            return appautorizaciond;
         }
 
-        // GET: Appautorizacionds/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Appautorizacionds/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: api/Appautorizacionds/Crear
         [HttpPost("Crear")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CodTercero,CodDependiente,CodAutorizacion")] Appautorizaciond appautorizaciond)
+        public async Task<ActionResult<Appautorizaciond>> CreateAppautorizaciond([FromBody] Appautorizaciond appautorizaciond)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(appautorizaciond);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return CreatedAtAction(nameof(GetAppautorizaciond), new { id = appautorizaciond.CodTercero }, appautorizaciond);
             }
-            return View(appautorizaciond);
+            return BadRequest(ModelState);
         }
 
-        // GET: Appautorizacionds/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var appautorizaciond = await _context.Appautorizacionds.FindAsync(id);
-            if (appautorizaciond == null)
-            {
-                return NotFound();
-            }
-            return View(appautorizaciond);
-        }
-
-        // POST: Appautorizacionds/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost("editar")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("CodTercero,CodDependiente,CodAutorizacion")] Appautorizaciond appautorizaciond)
+        // PUT: api/Appautorizacionds/Editar/5
+        [HttpPut("Editar/{id}")]
+        public async Task<IActionResult> UpdateAppautorizaciond(string id, [FromBody] Appautorizaciond appautorizaciond)
         {
             if (id != appautorizaciond.CodTercero)
             {
-                return NotFound();
+                return BadRequest();
             }
 
             if (ModelState.IsValid)
@@ -101,7 +70,7 @@ namespace ClubConnect2._0.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AppautorizaciondExists(appautorizaciond.CodTercero))
+                    if (!AppautorizaciondExists(id))
                     {
                         return NotFound();
                     }
@@ -110,42 +79,25 @@ namespace ClubConnect2._0.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return NoContent();
             }
-            return View(appautorizaciond);
+            return BadRequest(ModelState);
         }
 
-        // GET: Appautorizacionds/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        // DELETE: api/Appautorizacionds/Eliminar/5
+        [HttpDelete("Eliminar/{id}")]
+        public async Task<ActionResult<Appautorizaciond>> DeleteAppautorizaciond(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var appautorizaciond = await _context.Appautorizacionds
-                .FirstOrDefaultAsync(m => m.CodTercero == id);
+            var appautorizaciond = await _context.Appautorizacionds.FirstOrDefaultAsync(m => m.CodTercero == id);
             if (appautorizaciond == null)
             {
                 return NotFound();
             }
 
-            return View(appautorizaciond);
-        }
-
-        // POST: Appautorizacionds/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var appautorizaciond = await _context.Appautorizacionds.FindAsync(id);
-            if (appautorizaciond != null)
-            {
-                _context.Appautorizacionds.Remove(appautorizaciond);
-            }
-
+            _context.Appautorizacionds.Remove(appautorizaciond);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return appautorizaciond;
         }
 
         private bool AppautorizaciondExists(string id)

@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication1.Models;
 
-public partial class CuotasV100Context : DbContext
+public partial class CuotasV100Context : IdentityDbContext
 {
+    private DbConnection coneccion;
     public CuotasV100Context()
     {
-    }
+    
+    coneccion = new SqlConnection("Server=DLUGO_PC\\SQL_DLUGO_2K22;Database=cuotas_v100;UID=sa;PWD=Usuario1;TrustServerCertificate=True;");
+}
 
     public CuotasV100Context(DbContextOptions<CuotasV100Context> options)
         : base(options)
@@ -156,13 +163,21 @@ public partial class CuotasV100Context : DbContext
     public virtual DbSet<SaVerificarTer> SaVerificarTers { get; set; }
 
     public virtual DbSet<SaVisitum> SaVisita { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DLUGO_PC\\SQL_DLUGO_2K22;Database=cuotas_v100;UID=sa;PWD=Usuario1;Trust Server Certificate=True");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+
+        }
+    }
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder);
+    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+    //        => optionsBuilder.UseSqlServer("Server=DLUGO_PC\\SQL_DLUGO_2K22;Database=cuotas_v100;UID=sa;PWD=Usuario1;Trust Server Certificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Appautorizaciond>(entity =>
         {
             entity.HasKey(e => new { e.CodTercero, e.CodDependiente });
