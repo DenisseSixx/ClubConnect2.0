@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApplication1.Models;
+using DataManagment.Models;
 
 namespace ClubConnect2._0.Controllers
 {
@@ -54,7 +54,7 @@ namespace ClubConnect2._0.Controllers
 
         // PUT: api/Appautorizacionds/Editar/5
         [HttpPut("Editar/{id}")]
-        public async Task<IActionResult> UpdateAppautorizaciond(string id, [FromBody] Appautorizaciond appautorizaciond)
+        public async Task<IActionResult> UpdateAppautorizaciond(string id, int iddep, [FromBody] Appautorizaciond appautorizaciond)
         {
             if (id != appautorizaciond.CodTercero)
             {
@@ -86,9 +86,9 @@ namespace ClubConnect2._0.Controllers
 
         // DELETE: api/Appautorizacionds/Eliminar/5
         [HttpDelete("Eliminar/{id}")]
-        public async Task<ActionResult<Appautorizaciond>> DeleteAppautorizaciond(string id)
+        public async Task<ActionResult<Appautorizaciond>> DeleteAppautorizaciond(string id, int iddep)
         {
-            var appautorizaciond = await _context.Appautorizacionds.FirstOrDefaultAsync(m => m.CodTercero == id);
+            var appautorizaciond = await _context.Appautorizacionds.FirstOrDefaultAsync(m => m.CodTercero == id && m.CodDependiente == iddep);
             if (appautorizaciond == null)
             {
                 return NotFound();
@@ -102,7 +102,7 @@ namespace ClubConnect2._0.Controllers
 
         private bool AppautorizaciondExists(string id)
         {
-            return _context.Appautorizacionds.Any(e => e.CodTercero == id);
+            return _context.Appautorizacionds.Any(e => e.CodTercero == id );
         }
     }
 }

@@ -8,7 +8,7 @@ using Objects;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using WebApplication1.Models;
+using DataManagment.Models;
 
 
 namespace ClubConnect.Controllers

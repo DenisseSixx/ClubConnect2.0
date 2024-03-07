@@ -32,7 +32,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataManagment\DataManagment.csproj" />
-    <ProjectReference Include="..\Objects\Objects.csproj" />
+    <ProjectReference Include="..\Rules\Rules.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

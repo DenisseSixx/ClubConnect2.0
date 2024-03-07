@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using WebApplication1.Models;
+using DataManagment.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,11 +17,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Security
+
+//builder.Services.AddScoped<DataManagment.TokenService>();
+
+//DbConfig
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().
     AddEntityFrameworkStores<CuotasV100Context>().
     AddDefaultTokenProviders();
 
-//DbConfig
 builder.Services.AddDbContext<CuotasV100Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("conexion")));
 
@@ -65,6 +68,7 @@ builder.Services.AddSwaggerGen(c =>
 );
 
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,6 +77,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
 
 app.UseHttpsRedirection();
 

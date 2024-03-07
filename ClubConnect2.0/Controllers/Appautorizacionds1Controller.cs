@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models;
-
+using DataManagment.Models;
 namespace ClubConnect2._0.Controllers
 {
     public class Appautorizacionds1Controller : Controller

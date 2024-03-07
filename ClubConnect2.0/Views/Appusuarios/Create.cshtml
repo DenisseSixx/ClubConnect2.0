@@ -1,4 +1,4 @@
-﻿@model WebApplication1.Models.Appusuario
+﻿@model DataManagment.Models.Appusuario
 
 @{
     ViewData["Title"] = "Create";
@@ -41,6 +41,11 @@
                 <label asp-for="Nombre" class="control-label"></label>
                 <input asp-for="Nombre" class="form-control" />
                 <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Correo" class="control-label"></label>
+                <input asp-for="Correo" class="form-control" />
+                <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CodEstusu" class="control-label"></label>
