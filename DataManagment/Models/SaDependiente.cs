@@ -27,5 +27,5 @@ public partial class SaDependiente
 
     public virtual ICollection<Expediente> Expedientes { get; set; } = new List<Expediente>();
 
-    public virtual SaTercero SaTercero { get; set; } = null!;
+    //public virtual SaTercero SaTercero { get; set; } = null!;
 }

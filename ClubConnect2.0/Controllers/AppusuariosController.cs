@@ -11,6 +11,7 @@ using System.Text;
 using DataManagment.Models;
 using Rules;
 using System;
+using NuGet.Common;
 
 
 namespace ClubConnect2._0.Controllers
@@ -165,7 +166,7 @@ namespace ClubConnect2._0.Controllers
 
         [HttpGet("RenovarToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<RespuestaAutenticacion>> Renovar()
+        public async Task<ActionResult<Apprespuestaautenticacion>> Renovar()
         {
             try
             {
@@ -186,7 +187,7 @@ namespace ClubConnect2._0.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<RespuestaAutenticacion>> Login(Applogin applogin)
+        public async Task<ActionResult<Apprespuestaautenticacion>> Login(Applogin applogin)
         {
             try
             {
@@ -199,9 +200,15 @@ namespace ClubConnect2._0.Controllers
                     return BadRequest("Login Incorrecto");
                 }
 
-                // Construir y devolver el token
-                var tokenResponse = await ConstruirToken(new Appusuario { CodUsuario = applogin.CodUsuario, ClaUsuario = applogin.ClaUsuario });
+                var appusuario = new Appusuario { CodUsuario = applogin.CodUsuario, ClaUsuario = applogin.ClaUsuario };
+                var tokenResponse = await ConstruirToken(appusuario);
+
+                var respuestaAutenticacion = new RespuestaAutenticacion();
+                
+                respuestaAutenticacion.AgregarRespuestaAute(appusuario.CodUsuario, token2, expiraion2);
+
                 return tokenResponse;
+          
             }
             catch (Exception ex)
             {
@@ -209,27 +216,32 @@ namespace ClubConnect2._0.Controllers
             }
         }
 
-            private async Task<ActionResult<RespuestaAutenticacion>> ConstruirToken(Appusuario appusuario)
+            string token2;
+        DateTime expiraion2;
+            private async Task<ActionResult<Apprespuestaautenticacion>> ConstruirToken(Appusuario appusuario)
             {
                 try
                 {
-                    var claims = new List<Claim>()
+                var claims = new List<Claim>()
                     {
-                        new Claim("email", appusuario.CodUsuario)
+                        new Claim("CodUsuario", appusuario.CodUsuario)
 
                     };
 
-                    var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["LlaveJWT"]));
+                var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["LlaveJWT"]));
                     var creds = new SigningCredentials(llave, SecurityAlgorithms.HmacSha256);
                     var expiracion = DateTime.UtcNow.AddDays(1);
 
                     var securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiracion, signingCredentials: creds);
-
-                    return new RespuestaAutenticacion
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(securityToken),
-                        expiracion = expiracion
+                token2 = new JwtSecurityTokenHandler().WriteToken(securityToken);
+                expiraion2 = expiracion;
+                return new Apprespuestaautenticacion
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(securityToken),
+                        expiracion = expiracion,
+                          CodUsuario = appusuario.CodUsuario
                     };
+                
                 }
                 catch (Exception ex)
                 {
@@ -317,4 +329,6 @@ namespace ClubConnect2._0.Controllers
             return _context.Appusuarios.Any(e => e.CodUsuario == CodUsuario);
         }
     }
+
+
 }

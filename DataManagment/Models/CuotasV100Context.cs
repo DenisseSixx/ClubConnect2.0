@@ -24,6 +24,8 @@ public partial class CuotasV100Context : DbContext
 
     public virtual DbSet<Appautorizaciont> Appautorizacionts { get; set; }
     public virtual DbSet<Applogin> Applogin { get; set; }
+
+    public virtual DbSet<Apprespuestaautenticacion> Apprespuestaautenticacion { get; set; }
     public virtual DbSet<Appusuario> Appusuarios { get; set; }
 
     public virtual DbSet<Etipodocumento> Etipodocumentos { get; set; }
@@ -227,7 +229,24 @@ public partial class CuotasV100Context : DbContext
                 .IsUnicode(false)
                 .HasColumnName("CLA_USUARIO");
         });
+        modelBuilder.Entity<Apprespuestaautenticacion>(entity =>
+        {
+            entity.HasKey(e => e.CodUsuario);
 
+            entity.ToTable("APPRESPUESTAAUTE");
+
+            entity.Property(e => e.token)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("TOKEN");
+            entity.Property(e => e.expiracion)
+                .HasColumnType("datetime")
+                .HasColumnName("EXPIRACION");
+            entity.Property(e => e.CodUsuario)
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .HasColumnName("COD_USUARIO");
+        });
         modelBuilder.Entity<Appusuario>(entity =>
         {
             entity.HasKey(e => e.CodUsuario);
@@ -1533,10 +1552,10 @@ public partial class CuotasV100Context : DbContext
                 .HasColumnType("numeric(18, 2)")
                 .HasColumnName("SALDO_CREDITO");
 
-            entity.HasOne(d => d.SaTercero).WithMany(p => p.SaDependientes)
+           /* entity.HasOne(d => d.SaTercero).WithMany(p => p.SaDependientes)
                 .HasForeignKey(d => new { d.CodEmpresa, d.CodCliente, d.CodTercero })
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SA_DEPENDIENTE_SA_TERCERO");
+                .HasConstraintName("FK_SA_DEPENDIENTE_SA_TERCERO");*/
         });
 
         modelBuilder.Entity<SaDesDocumentoDigitalizado>(entity =>

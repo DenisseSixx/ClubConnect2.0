@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using DataManagment.Models;
+using Rules;
 
 
 namespace ClubConnect.Controllers
@@ -18,99 +19,61 @@ namespace ClubConnect.Controllers
     public class CuentasController : Controller
     {
         IConsultas consulta;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IConfiguration _config;
-        private readonly SignInManager<IdentityUser> _signInManager;
+
         private readonly CuotasV100Context _context;
-    
+        private readonly EstadoCuentaItem _estadoCuenta;
+        public string codter;
+
         public CuentasController(
-            UserManager<IdentityUser> userManager,
-            IConfiguration config,
-            SignInManager<IdentityUser> signInManager,
+
             CuotasV100Context context
             )
         {
-            _userManager = userManager;
-            _config = config;
-            _signInManager = signInManager;
+
             _context = context;
+            _estadoCuenta = new EstadoCuentaItem();
         }
 
-        [HttpPost("registrar")]
-        public async Task<ActionResult<RespuestaAutenticacion>> Registrar(CredencialesUsuario credencialesUsuario)
+      /*  [HttpGet("{codtercero}")]
+        public IActionResult EstadosCuenta(string codtercero)
         {
-            
-            var usuario = new IdentityUser
+            EstadoCuenta estadoCuenta = new EstadoCuenta();
+            var resultados = estadoCuenta.EstadosCuenta(codtercero);
+
+            if (resultados != null)
             {
-                UserName = credencialesUsuario.CodTercero,
-                Email = credencialesUsuario.Clave
-            };
-            var resultado = await _userManager.CreateAsync(usuario, credencialesUsuario.Clave);
-            if (resultado.Succeeded)
-            {
-                return await ConstruirToken(credencialesUsuario);
-            }
-            return BadRequest(resultado.Errors);
-        }
-
-        private async Task<ActionResult<RespuestaAutenticacion>> ConstruirToken(CredencialesUsuario credencialesUsuario)
-        {
-            var claims = new List<Claim>()
-        {
-            new Claim("CodTercero",credencialesUsuario.CodTercero)
-        };
-            var usuario = await _userManager.FindByEmailAsync(credencialesUsuario.CodTercero);
-            var claimsRoles = await _userManager.GetClaimsAsync(usuario);
-
-            claims.AddRange(claims);
-
-            var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["LlaveJWT"]));
-            var creds = new SigningCredentials(llave, SecurityAlgorithms.HmacSha256);
-
-            var expiracion = DateTime.UtcNow.AddDays(1);
-
-            var securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiracion, signingCredentials: creds);
-
-            return new RespuestaAutenticacion
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(securityToken),
-                expiracion = expiracion,
-            };
-        }
-
-
-        [HttpGet("RenovarToken")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
-        public async Task<ActionResult<RespuestaAutenticacion>> Renovar()
-        {
-
-            var CodTeceroClaims = HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).Select(x => x.Value).FirstOrDefault();
-            var credencialesUsuario = new CredencialesUsuario() { CodTercero = CodTeceroClaims };
-
-            return await ConstruirToken(credencialesUsuario);
-        }
-        
-        [HttpPost("Login")]
-        public async Task<ActionResult<RespuestaAutenticacion>> Login(CredencialesUsuario credencialesUsuario)
-        {
-            var resultado = await _signInManager.PasswordSignInAsync(
-                credencialesUsuario.CodTercero,
-                credencialesUsuario.Clave,
-                isPersistent: false,
-                lockoutOnFailure: false);
-            if (resultado.Succeeded)
-            {
-                return await ConstruirToken(credencialesUsuario);
+                return Ok(resultados); // Devuelve los resultados como una respuesta HTTP 200 OK
             }
             else
             {
-                return BadRequest("Login Incorrecto");
+                return NotFound(); // Devuelve una respuesta HTTP 404 Not Found si no se encontraron resultados
+            }
+        }
+      */
+        [HttpGet("ObtenerEstadoCuenta{codUsuario}")]
+        public IActionResult EstadosCuenta2(string codUsuario)
+        {
+            // Consulta la tabla AppUsuarios para obtener el codTercero asociado al codUsuario
+            var appUsuario = _context.Appusuarios.FirstOrDefault(u => u.CodUsuario == codUsuario);
+            if (appUsuario == null)
+            {
+                return NotFound(); // Devuelve una respuesta HTTP 404 Not Found si no se encuentra el usuario en la tabla AppUsuarios
+            }
+            string codTercero = appUsuario.CodTercero;
+
+            // Llama al método EstadosCuenta con el codTercero obtenido
+            EstadoCuenta estadoCuenta = new EstadoCuenta();
+            var resultados = estadoCuenta.EstadoCuentaGeneral(codTercero);
+
+            if (resultados != null)
+            {
+                return Ok(resultados); // Devuelve los resultados como una respuesta HTTP 200 OK
+            }
+            else
+            {
+                return NotFound(); // Devuelve una respuesta HTTP 404 Not Found si no se encontraron resultados
             }
         }
     }
 }
 
-
-
-    
