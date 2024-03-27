@@ -67,6 +67,27 @@ namespace ClubConnect2._0.Controllers
             return Ok(appusuario);
         }
 
+        [HttpGet("ObtenerPorIDCodTercero/{CodUsuario}")]
+        public async Task<IActionResult> ObtenerPorIDCodTercero(string CodUsuario)
+        {
+            if (CodUsuario == null)
+            {
+                return NotFound();
+            }
+
+            var appusuario = await _context.Appusuarios
+                .Where(m => m.CodUsuario == CodUsuario)
+                .Select(m => m.CodTercero)
+                .FirstOrDefaultAsync();
+
+            if (appusuario == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(appusuario);
+        }
+
 
         //         [HttpPost("CrearUsuario")]
         //         public async Task<ActionResult<RespuestaAutenticacion>> CrearUsuario(Appusuario appusuario)

@@ -50,7 +50,7 @@ namespace ClubConnect.Controllers
             }
         }
       */
-        [HttpGet("ObtenerEstadoCuenta{codUsuario}")]
+        [HttpGet("ObtenerEstadoCuenta/{codUsuario}")]
         public IActionResult EstadosCuenta2(string codUsuario)
         {
             // Consulta la tabla AppUsuarios para obtener el codTercero asociado al codUsuario
