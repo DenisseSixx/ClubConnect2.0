@@ -21,15 +21,22 @@ namespace ClubConnect2._0.Controllers
         }
 
         [HttpPost("Crear")]
-        public async Task<ActionResult<Expedientetercero>> CreateAppautorizaciond([FromBody] Expedientetercero expedientetercero)
+        public async Task<ActionResult<ExpedienteIntermediaria>> CreateExpedienteIntermediaria([FromBody] ExpedienteIntermediaria expedienteIntermediaria)
         {
+            if (expedienteIntermediaria == null)
+            {
+                return BadRequest("El objeto de expedienteIntermediaria es nulo.");
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(expedientetercero);
+                _context.Add(expedienteIntermediaria);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(expedientetercero), new { id = expedientetercero.CodTercero }, expedientetercero);
+                return CreatedAtAction(nameof(CreateExpedienteIntermediaria), new { id = expedienteIntermediaria.CodArchivo }, expedienteIntermediaria);
             }
+
             return BadRequest(ModelState);
         }
+
     }
-}
+    }

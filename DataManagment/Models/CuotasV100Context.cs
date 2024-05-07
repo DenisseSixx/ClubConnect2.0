@@ -32,6 +32,8 @@ public partial class CuotasV100Context : DbContext
 
     public virtual DbSet<Expediente> Expedientes { get; set; }
 
+    public virtual DbSet<ExpedienteIntermediaria> ExpedienteIntermediaria { get; set; }
+
     public virtual DbSet<Expedientetercero> Expedienteterceros { get; set; }
 
     public virtual DbSet<SaBiometriaCopium> SaBiometriaCopia { get; set; }
@@ -277,7 +279,7 @@ public partial class CuotasV100Context : DbContext
                 .IsUnicode(false)
                 .HasColumnName("NOM_USUARIO");
             entity.Property(e => e.Nombre)
-                .HasMaxLength(50)
+                .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("NOMBRE");
         });
@@ -360,6 +362,49 @@ public partial class CuotasV100Context : DbContext
                 .HasForeignKey(d => new { d.CodEmpresa, d.CodCliente, d.CodTercero, d.CodDependiente })
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Expediente_SA_DEPENDIENTE");
+        });
+
+        modelBuilder.Entity<ExpedienteIntermediaria>(entity =>
+        {
+            entity.HasKey(e => new { e.CodArchivo, e.CodEmpresa, e.CodCliente, e.CodTercero, e.CodDependiente, e.CodTipodocumento });
+
+            entity.ToTable("EXPEDIENTE_INTERMEDIARIA");
+
+            entity.Property(e => e.CodArchivo)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("COD_ARCHIVO");
+            entity.Property(e => e.CodEmpresa)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("COD_EMPRESA");
+            entity.Property(e => e.CodCliente)
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .HasColumnName("COD_CLIENTE");
+            entity.Property(e => e.CodTercero)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("COD_TERCERO");
+            entity.Property(e => e.CodDependiente)
+                .HasColumnType("numeric(10, 0)")
+                .HasColumnName("COD_DEPENDIENTE");
+            entity.Property(e => e.CodTipodocumento).HasColumnName("COD_TIPODOCUMENTO");
+            entity.Property(e => e.CodEstusu)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .HasColumnName("COD_ESTUSU");
+            entity.Property(e => e.Documento).HasColumnName("DOCUMENTO");
+            entity.Property(e => e.ExtDocumento)
+                .HasMaxLength(100)
+                .HasColumnName("EXT_DOCUMENTO");
+            entity.Property(e => e.Fecha)
+                .HasColumnType("datetime")
+                .HasColumnName("FECHA");
+            entity.Property(e => e.NomDocumento)
+                .HasMaxLength(50)
+                .HasColumnName("NOM_DOCUMENTO");
+
+          
         });
 
         modelBuilder.Entity<Expedientetercero>(entity =>

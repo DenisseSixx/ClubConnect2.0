@@ -158,7 +158,7 @@ namespace ClubConnect2._0.Controllers
                 _context.Appusuarios.Add(appusuario);
                 await _context.SaveChangesAsync();
                 var tablaLogin = new TablaLogin();
-                tablaLogin.AgregarDatosLogin( );
+                tablaLogin.AgregarDatosLogin();
                 // El usuario se ha creado correctamente, devolver un código 201 (Created)
                 return StatusCode(201);
             }
@@ -172,7 +172,7 @@ namespace ClubConnect2._0.Controllers
             }
         }
 
-       
+
 
         /*[HttpGet("RenovarToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -225,11 +225,11 @@ namespace ClubConnect2._0.Controllers
                 var tokenResponse = await ConstruirToken(appusuario);
 
                 var respuestaAutenticacion = new RespuestaAutenticacion();
-                
+
                 respuestaAutenticacion.AgregarRespuestaAute(appusuario.CodUsuario, token2, expiraion2);
 
                 return tokenResponse;
-          
+
             }
             catch (Exception ex)
             {
@@ -237,12 +237,12 @@ namespace ClubConnect2._0.Controllers
             }
         }
 
-            string token2;
+        string token2;
         DateTime expiraion2;
-            private async Task<ActionResult<Apprespuestaautenticacion>> ConstruirToken(Appusuario appusuario)
+        private async Task<ActionResult<Apprespuestaautenticacion>> ConstruirToken(Appusuario appusuario)
+        {
+            try
             {
-                try
-                {
                 var claims = new List<Claim>()
                     {
                         new Claim("CodUsuario", appusuario.CodUsuario)
@@ -250,36 +250,36 @@ namespace ClubConnect2._0.Controllers
                     };
 
                 var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["LlaveJWT"]));
-                    var creds = new SigningCredentials(llave, SecurityAlgorithms.HmacSha256);
-                    var expiracion = DateTime.UtcNow.AddDays(1);
+                var creds = new SigningCredentials(llave, SecurityAlgorithms.HmacSha256);
+                var expiracion = DateTime.UtcNow.AddDays(1);
 
-                    var securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiracion, signingCredentials: creds);
+                var securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiracion, signingCredentials: creds);
                 token2 = new JwtSecurityTokenHandler().WriteToken(securityToken);
                 expiraion2 = expiracion;
                 return new Apprespuestaautenticacion
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(securityToken),
-                        expiracion = expiracion,
-                          CodUsuario = appusuario.CodUsuario
-                    };
-                
-                }
-                catch (Exception ex)
-                {
+                    expiracion = expiracion,
+                    CodUsuario = appusuario.CodUsuario
+                };
 
-                    return BadRequest($"Error al construir el token: {ex.Message}");
-                }
             }
-        
+            catch (Exception ex)
+            {
+
+                return BadRequest($"Error al construir el token: {ex.Message}");
+            }
+        }
+
 
 
 
 
         [HttpPut("EditarUsuario/{CodUsuario}")]
-       // [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarUsuario(string CodUsuario, [FromBody] Appusuario appusuario)
         {
-            if (CodUsuario!= appusuario.CodUsuario)
+            if (CodUsuario != appusuario.CodUsuario)
             {
                 return BadRequest();
             }
@@ -309,30 +309,30 @@ namespace ClubConnect2._0.Controllers
             return BadRequest(ModelState);
         }
 
-       
 
-            /* [HttpDelete("EliminarUsuario/{CodUsuario}")]
-             public async Task<IActionResult> EliminarUsuario(string CodUsuario)
+
+        /* [HttpDelete("EliminarUsuario/{CodUsuario}")]
+         public async Task<IActionResult> EliminarUsuario(string CodUsuario)
+         {
+             if (CodUsuario  == null)
              {
-                 if (CodUsuario  == null)
-                 {
-                     return NotFound();
-                 }
-
-                 var appusuario = await _context.Appusuarios
-                     .FirstOrDefaultAsync(m => m.CodUsuario == CodUsuario);
-                 if (appusuario == null)
-                 {
-                     return NotFound();
-                 }
-
-                 return Ok(appusuario);
+                 return NotFound();
              }
-            */
+
+             var appusuario = await _context.Appusuarios
+                 .FirstOrDefaultAsync(m => m.CodUsuario == CodUsuario);
+             if (appusuario == null)
+             {
+                 return NotFound();
+             }
+
+             return Ok(appusuario);
+         }
+        */
 
 
-            [HttpDelete("EliminarUsuarioConfirmado/{CodUsuario}")]
-       // [ValidateAntiForgeryToken]
+        [HttpDelete("EliminarUsuarioConfirmado/{CodUsuario}")]
+        // [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarUsuarioConfirmado(string CodUsuario)
         {
             var appusuario = await _context.Appusuarios.FindAsync(CodUsuario);
@@ -349,7 +349,39 @@ namespace ClubConnect2._0.Controllers
         {
             return _context.Appusuarios.Any(e => e.CodUsuario == CodUsuario);
         }
+
+    
+        [HttpPut("EditarContrasena/{CodUsuario}")]
+        public async Task<IActionResult> CambiarContrasena(string CodUsuario, [FromBody] string claUsuario)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingAppusuarios = await _context.Appusuarios.FirstOrDefaultAsync(x => x.CodUsuario == CodUsuario);
+                    if (existingAppusuarios == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingAppusuarios.ClaUsuario = claUsuario; // Actualiza el campo claUsuario con el valor proporcionado
+
+                    await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
+                    var tablaLogin = new TablaLogin();
+                    tablaLogin.AgregarDatosLogin();
+                    // El usuario se ha creado correctamente, devolver un código 201 (Created)
+                    return StatusCode(201);
+                    return NoContent();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+
+                }
+               
+            }
+            return BadRequest(ModelState);
+
+
+        }
     }
-
-
 }
