@@ -417,6 +417,71 @@ namespace ClubConnect2._0.Identity.Migrations
 
                     b.ToTable("Expediente", (string)null);
                 });
+            modelBuilder.Entity("WebApplication1.Models.ExpedienteIntermediaria", b =>
+            {
+                b.Property<int>("CodArchivo")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int")
+                    .HasColumnName("COD_ARCHIVO");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CodArchivo"));
+
+                b.Property<string>("CodEmpresa")
+                    .HasMaxLength(5)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(5)")
+                    .HasColumnName("COD_EMPRESA");
+
+                b.Property<string>("CodCliente")
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(15)")
+                    .HasColumnName("COD_CLIENTE");
+
+                b.Property<string>("CodTercero")
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(20)")
+                    .HasColumnName("COD_TERCERO");
+
+                b.Property<decimal>("CodDependiente")
+                    .HasColumnType("numeric(10, 0)")
+                    .HasColumnName("COD_DEPENDIENTE");
+
+                b.Property<int>("CodTipodocumento")
+                    .HasColumnType("int")
+                    .HasColumnName("COD_TIPODOCUMENTO");
+
+                b.Property<string>("CodEstusu")
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(1)")
+                    .HasColumnName("COD_ESTUSU");
+
+                b.Property<byte[]>("Documento")
+                    .IsRequired()
+                    .HasColumnType("varbinary(max)")
+                    .HasColumnName("DOCUMENTO");
+
+                b.Property<string>("ExtDocumento")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)")
+                    .HasColumnName("EXT_DOCUMENTO");
+
+                b.Property<DateTime?>("Fecha")
+                    .HasColumnType("datetime")
+                    .HasColumnName("FECHA");
+
+                b.Property<string>("NomDocumento")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar(50)")
+                    .HasColumnName("NOM_DOCUMENTO");
+
+              
+            });
 
             modelBuilder.Entity("WebApplication1.Models.Expedientetercero", b =>
                 {

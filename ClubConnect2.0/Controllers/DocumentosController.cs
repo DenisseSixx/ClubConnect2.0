@@ -21,22 +21,33 @@ namespace ClubConnect2._0.Controllers
         }
 
         [HttpPost("Crear")]
-        public async Task<ActionResult<ExpedienteIntermediaria>> CreateExpedienteIntermediaria([FromBody] ExpedienteIntermediaria expedienteIntermediaria)
+        public async Task<ActionResult> CrearDocumento(ExpedienteIntermediaria expedienteIntermediaria)
         {
-            if (expedienteIntermediaria == null)
+            try
             {
-                return BadRequest("El objeto de expedienteIntermediaria es nulo.");
-            }
+                if (expedienteIntermediaria == null)
+                {
+                    return BadRequest("El objeto expedienteIntermediaria es nulo.");
+                }
 
-            if (ModelState.IsValid)
-            {
+                // Establecer la fecha actual
+                expedienteIntermediaria.Fecha = DateTime.Now;
+                if (expedienteIntermediaria.CodArchivo == null)
+                {
+                    return BadRequest("La propiedad CodArchivo del objeto expedienteIntermediaria es null.");
+                }
+
                 _context.Add(expedienteIntermediaria);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(CreateExpedienteIntermediaria), new { id = expedienteIntermediaria.CodArchivo }, expedienteIntermediaria);
-            }
 
-            return BadRequest(ModelState);
+                return Ok("ExpedienteIntermediaria creado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                var innerExceptionMessage = (ex.InnerException != null) ? ex.InnerException.Message : "";
+                return BadRequest($"Error al crear el expedienteIntermediaria. Detalles: {ex.Message}. Excepción interna: {innerExceptionMessage}");
+            }
         }
 
     }
-    }
+}
